@@ -1,5 +1,5 @@
-import * as parser from "./parser.js";
-import {loadTimetables} from "./timetables.js";
+import * as parser from './parser.js';
+import { loadTimetables } from './timetables.js';
 
 function correctName(name) {
     for (let key in namesCorrectionsAsJson) {
@@ -25,14 +25,14 @@ function getMostCommon(array) {
     array.forEach((element) => {
         counts[element] = (counts[element] || 0) + 1;
     });
-    return Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+    return Object.keys(counts).reduce((a, b) => (counts[a] > counts[b] ? a : b));
 }
 
 export function capitalizeFirstLetter(string) {
     if (string === string.toUpperCase()) {
         let output = '';
         string.split(' ').forEach((element) => {
-            output += element.charAt(0).toUpperCase() + element.slice(1).toLowerCase() + ' '
+            output += element.charAt(0).toUpperCase() + element.slice(1).toLowerCase() + ' ';
         });
         return correctName(output.slice(0, -1));
     } else {
@@ -76,10 +76,15 @@ export function createTrainData(stopPoint, timetable, isHistorical = false) {
 
     if (isHistorical) {
         train.departureAt = convertTime(timetable['checkpointDeparturesScheduled'][0]);
-        train.arrivalAt = convertTime(timetable['checkpointArrivalsScheduled'][timetable['checkpointArrivalsScheduled'].length - 1]);
+        train.arrivalAt = convertTime(
+            timetable['checkpointArrivalsScheduled'][timetable['checkpointArrivalsScheduled'].length - 1]
+        );
         train.gameCategory = timetable['trainCategoryCode'];
 
-        let stopPointIndex =  timetable['sceneriesString'].toUpperCase().split("%").indexOf(stopPoint['stopName'].toUpperCase());
+        let stopPointIndex = timetable['sceneriesString']
+            .toUpperCase()
+            .split('%')
+            .indexOf(stopPoint['stopName'].toUpperCase());
 
         if (!stopPoint['beginsHere']) {
             train.beforeDepartureAt = convertTime(timetable['checkpointDeparturesScheduled'][stopPointIndex - 1]);
@@ -100,7 +105,7 @@ export function createTrainData(stopPoint, timetable, isHistorical = false) {
         if (!stopPoint['beginsHere']) {
             //train.beforeDepartureAt = convertTime(timetable['stopList'][timetable['stopList'].indexOf(stopPoint) - 1]['departureTimestamp']);
             for (let i = timetable['stopList'].indexOf(stopPoint) - 1; i >= 0; i--) {
-                if (!postTypes.some(type => timetable['stopList'][i]['stopName'].includes(type))) {
+                if (!postTypes.some((type) => timetable['stopList'][i]['stopName'].includes(type))) {
                     train.beforeDepartureAt = convertTime(timetable['stopList'][i]['departureTimestamp']);
                     break;
                 }
@@ -112,7 +117,7 @@ export function createTrainData(stopPoint, timetable, isHistorical = false) {
         if (!stopPoint['terminatesHere']) {
             //train.afterArrivalAt = convertTime(timetable['stopList'][timetable['stopList'].indexOf(stopPoint) + 1]['arrivalTimestamp']);
             for (let i = timetable['stopList'].indexOf(stopPoint) + 1; i < timetable['stopList'].length; i++) {
-                if (!postTypes.some(type => timetable['stopList'][i]['stopName'].includes(type))) {
+                if (!postTypes.some((type) => timetable['stopList'][i]['stopName'].includes(type))) {
                     train.afterArrivalAt = convertTime(timetable['stopList'][i]['arrivalTimestamp']);
                     break;
                 }
@@ -131,11 +136,10 @@ export function createTrainData(stopPoint, timetable, isHistorical = false) {
     train.operator = train.gameCategory;
     train.trainName = '';
     train.platform = 1;
-    train.track = 1
+    train.track = 1;
 
     if (stopPoint['comments'] && stopPoint['comments'].split(',').length > 1) {
-        if (isNumber(stopPoint['comments'].split(',')[0])
-            && isNumber(stopPoint['comments'].split(',')[1])) {
+        if (isNumber(stopPoint['comments'].split(',')[0]) && isNumber(stopPoint['comments'].split(',')[1])) {
             train.platform = stopPoint['comments'].split(',')[0];
             train.track = stopPoint['comments'].split(',')[1];
         }
@@ -147,18 +151,26 @@ export function createTrainData(stopPoint, timetable, isHistorical = false) {
 export function createRemark(delay = 0, beginsTerminatesHere, isStopped) {
     if (delay > 0) {
         if (isStopped) {
-            if (overlayName === 'starysacz') { return `󠀠󠀠• Pociąg został zatrzymany na trasie • The train has been stopped on route •`; }
+            if (overlayName === 'starysacz') {
+                return `󠀠󠀠• Pociąg został zatrzymany na trasie • The train has been stopped on route •`;
+            }
             return `Pociąg został zatrzymany na trasie/train has been stopped on route/Der Zug wurde auf der Strecke angehalten`;
         } else {
-            if (overlayName === 'starysacz') { return `󠀠󠀠• Opóźniony ${delay}min • Delayed ${delay}min •󠀠󠀠󠀠󠀠`; }
+            if (overlayName === 'starysacz') {
+                return `󠀠󠀠• Opóźniony ${delay}min • Delayed ${delay}min •󠀠󠀠󠀠󠀠`;
+            }
             return `Opóźniony ${delay}min/delayed ${delay}min/Verspätung ${delay}min`;
         }
     } else if (beginsTerminatesHere) {
         if (isDeparture) {
-            if (overlayName === 'starysacz') { return `󠀠󠀠• Pociąg rozpoczyna bieg • The train begins here • 󠀠󠀠󠀠󠀠`; }
+            if (overlayName === 'starysacz') {
+                return `󠀠󠀠• Pociąg rozpoczyna bieg • The train begins here • 󠀠󠀠󠀠󠀠`;
+            }
             return 'Pociąg rozpoczyna bieg/train begins here/Zug beginnt hier';
         } else {
-            if (overlayName === 'starysacz') { return `󠀠󠀠• Pociąg kończy bieg • The train terminates here • 󠀠󠀠󠀠󠀠`; }
+            if (overlayName === 'starysacz') {
+                return `󠀠󠀠• Pociąg kończy bieg • The train terminates here • 󠀠󠀠󠀠󠀠`;
+            }
             return 'Pociąg kończy bieg/train terminates here/Zug endet hier';
         }
     } else {
@@ -171,7 +183,9 @@ export function addRow(train, index) {
     switch (overlayName) {
         case 'tomaszow':
             row.append($('<td>').text(train.arrivalDepartureAt));
-            row.append($('<td>').append($('<div>').append($('<span>').text(createTrainString(train.category, train.trainNo)))));
+            row.append(
+                $('<td>').append($('<div>').append($('<span>').text(createTrainString(train.category, train.trainNo))))
+            );
             row.append($('<td>').append($('<span>').text(train.stationFromTo)));
             row.append($('<td>').append($('<span>')));
             row.append($('<td>').text(train.operator));
@@ -179,39 +193,35 @@ export function addRow(train, index) {
             row.append($('<td>').append($('<span>')));
             break;
         case 'krakow':
-            row.append($('<td>')
-                .append($('<p>').text(train.arrivalDepartureAt))
-                .append($('<div>').addClass('indented')
-                    .append($('<span>').text(createTrainString(train.category, train.trainNo)))
-                )
+            row.append(
+                $('<td>')
+                    .append($('<p>').text(train.arrivalDepartureAt))
+                    .append(
+                        $('<div>')
+                            .addClass('indented')
+                            .append($('<span>').text(createTrainString(train.category, train.trainNo)))
+                    )
             );
             row.append($('<td>').text(train.operator));
-            row.append($('<td>')
-                .append($('<div>')
-                    .append($('<span>').text(train.stationFromTo))
-                )
-                .append($('<div>').addClass('indented')
-                    .append($('<span>'))
-                )
+            row.append(
+                $('<td>')
+                    .append($('<div>').append($('<span>').text(train.stationFromTo)))
+                    .append($('<div>').addClass('indented').append($('<span>')))
             );
             row.append($('<td>').append($('<span>')));
             row.append($('<td>').text(train.platform));
             break;
         case 'starysacz':
             row.append($('<td>').text(train.arrivalDepartureAt));
-            row.append($('<td>')
-                .append($('<p>').text(train.operator))
-                .append($('<div>')
-                    .append($('<span>').text(createTrainString(train.category, train.trainNo)))
-                )
+            row.append(
+                $('<td>')
+                    .append($('<p>').text(train.operator))
+                    .append($('<div>').append($('<span>').text(createTrainString(train.category, train.trainNo))))
             );
-            row.append($('<td>')
-                .append($('<div>')
-                    .append($('<span>').text(train.stationFromTo))
-                )
-                .append($('<div>').addClass('indented')
-                    .append($('<span>'))
-                )
+            row.append(
+                $('<td>')
+                    .append($('<div>').append($('<span>').text(train.stationFromTo)))
+                    .append($('<div>').addClass('indented').append($('<span>')))
             );
             row.append($('<td>').append($('<span>')));
             row.append($('<td>').text(train.platform));
@@ -241,28 +251,42 @@ export function addRow(train, index) {
             }
 
             row.append($('<td>').addClass('time').text(train.arrivalDepartureAt));
-            row.append($('<td>').addClass('platform')
-                .append($('<b>').text(train.platform).append($('<br>')))
-                .append(train.track)
+            row.append(
+                $('<td>')
+                    .addClass('platform')
+                    .append($('<b>').text(train.platform).append($('<br>')))
+                    .append(train.track)
             );
-            row.append($('<td>').addClass('operator')
-                .append($('<div>')
-                    .append($('<span>').addClass('train-category').text(train.operator).append($('<b>').text(train.category)))
-                    .append($('<span>').addClass('train-no').append(train.trainNo))
-                    .append($('<span>').addClass('train-name').append(train.trainName.toUpperCase()))
-                    //.append($('<span>').addClass('material-symbols-outlined').append(symbols.join(' ')))
-                    .append(symbolsDiv)
-                )
-            );
-            row.append($('<td colspan="2">').addClass('fromTo')
-                .append($('<div>')
-                    .append($('<div>')
-                        .append($('<span>').addClass('stop-list'))
-                        .append($('<span>').addClass('departure text-bold'))
+            row.append(
+                $('<td>')
+                    .addClass('operator')
+                    .append(
+                        $('<div>')
+                            .append(
+                                $('<span>')
+                                    .addClass('train-category')
+                                    .text(train.operator)
+                                    .append($('<b>').text(train.category))
+                            )
+                            .append($('<span>').addClass('train-no').append(train.trainNo))
+                            .append($('<span>').addClass('train-name').append(train.trainName.toUpperCase()))
+                            //.append($('<span>').addClass('material-symbols-outlined').append(symbols.join(' ')))
+                            .append(symbolsDiv)
                     )
-                    .append($('<span>').addClass('extra-symbols'))
-                    .append($('<span>').addClass('extra'))
-                )
+            );
+            row.append(
+                $('<td colspan="2">')
+                    .addClass('fromTo')
+                    .append(
+                        $('<div>')
+                            .append(
+                                $('<div>')
+                                    .append($('<span>').addClass('stop-list'))
+                                    .append($('<span>').addClass('departure text-bold'))
+                            )
+                            .append($('<span>').addClass('extra-symbols'))
+                            .append($('<span>').addClass('extra'))
+                    )
             );
             break;
         case 'wyciag':
@@ -320,7 +344,7 @@ export function purgeTimetablesTable(overlays = []) {
 }
 
 export function convertTime(time) {
-    let date = new Date(time).toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'})
+    let date = new Date(time).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
     if (overlayName === 'wyciag' || overlayName === 'plakat') {
         return date.replace(/^0/, '');
     }
@@ -330,9 +354,8 @@ export function convertTime(time) {
 export function createDepartureTime(time, timespan) {
     let date = new Date(time);
     date.setMinutes(date.getMinutes() + timespan);
-    return date.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'}).replace(/^0/, '');
+    return date.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }).replace(/^0/, '');
 }
-
 
 export function createTrainString(category, trainNo) {
     return category + ' ' + trainNo;
@@ -376,7 +399,7 @@ export function convertOperator(train) {
         });
         operatorsAsJson['overwrite'].forEach((overwrite) => {
             if (overwrite.operator === train.operator) {
-                if (overwrite['trainNoStartsWith'].some(a => train.trainNo.toString().startsWith(a))) {
+                if (overwrite['trainNoStartsWith'].some((a) => train.trainNo.toString().startsWith(a))) {
                     train.operator = overwrite['operatorOverwrite'];
                     train.category = overwrite.category[train.gameCategory.substring(0, 2)];
 
@@ -409,8 +432,7 @@ export function createDate(isDot = false, showYear = true) {
     let day = date.getDate();
     let month = date.getMonth() + 1;
     let year = date.getFullYear();
-    let romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII',
-        'IX', 'X', 'XI', 'XII'];
+    let romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
 
     if (isDot) {
         return `${('0' + day).slice(-2)}.${romanNumerals[month - 1]}.${year}`;
@@ -423,7 +445,6 @@ export function createDate(isDot = false, showYear = true) {
     }
 }
 
-
 export function createSymbolsList(trainCars) {
     let symbols = '';
     trainCars.split(';').forEach((car) => {
@@ -432,9 +453,12 @@ export function createSymbolsList(trainCars) {
         }
     });
 
-    symbols = symbols.split('').filter(function(item, pos, self) {
-        return self.indexOf(item) === pos;
-    }).join('');
+    symbols = symbols
+        .split('')
+        .filter(function (item, pos, self) {
+            return self.indexOf(item) === pos;
+        })
+        .join('');
 
     let order = carsDataAsJson['symbols-order'];
     let sortedSymbols = '';
@@ -454,21 +478,26 @@ export function addDays(date, days) {
     return newDate.toISOString().slice(0, 10);
 }
 
-
 export function scrollTimetableUp() {
     if ($('body').hasClass('kiosk')) {
         if (lastIndex === 0) {
-            $('html, body').animate({
-                scrollTop: 0
-            }, 0);
+            $('html, body').animate(
+                {
+                    scrollTop: 0,
+                },
+                0
+            );
             window.lastIndex = -1;
         }
 
         if (lastIndex > 0) {
             window.lastIndex -= 1;
-            $('html, body').animate({
-                scrollTop: $(`#${lastIndex}`).offset().top
-            }, 0);
+            $('html, body').animate(
+                {
+                    scrollTop: $(`#${lastIndex}`).offset().top,
+                },
+                0
+            );
         }
     }
 }
@@ -476,9 +505,12 @@ export function scrollTimetableUp() {
 export function scrollTimetableDown() {
     if ($(window).scrollTop() + $(window).height() !== $(document).height()) {
         window.lastIndex += 1;
-        $('html, body').animate({
-            scrollTop: $(`#${lastIndex}`).offset().top
-        }, 0);
+        $('html, body').animate(
+            {
+                scrollTop: $(`#${lastIndex}`).offset().top,
+            },
+            0
+        );
     }
 }
 
@@ -491,4 +523,3 @@ window.loadTimetablesFromUrl = (url) => {
     window.timetablesAPI = url;
     parser.makeAjaxRequest(timetablesAPI, 'timetablesAsJson').then(() => loadTimetables());
 };
-

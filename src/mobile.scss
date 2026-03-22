@@ -1,107 +1,109 @@
 @media only screen and (hover: none) {
-	[mobile] {
-		display: block !important;
-	}
+    [mobile] {
+        display: block !important;
+    }
 
-	body {
-		#menu {
-			#button-box {
-				padding: 0.8vmin 1vmin;
-				flex-direction: column;
+    body {
+        #menu {
+            #button-box {
+                padding: 0.8vmin 1vmin;
+                flex-direction: column;
 
-				a {
-					font-size: 8vmin;
-				}
+                a {
+                    font-size: 8vmin;
+                }
 
-				#type-button {
-					order: 2;
-				}
+                #type-button {
+                    order: 2;
+                }
 
-				#margin-button {
-					display: none;
-				}
-			}
+                #margin-button {
+                    display: none;
+                }
+            }
 
-			#menu-box, #menu-box-2 {
-				section {
-					width: 65vmin;
-					height: 90vmin;
+            #menu-box,
+            #menu-box-2 {
+                section {
+                    width: 65vmin;
+                    height: 90vmin;
 
-					div {
-						select, input {
-							font-size: 2.4vmin;
-							width: 45vmin;
-							height: 5vmin;
-							padding-left: 0.6vmin;
-							margin: 2.5vmin;
-						}
+                    div {
+                        select,
+                        input {
+                            font-size: 2.4vmin;
+                            width: 45vmin;
+                            height: 5vmin;
+                            padding-left: 0.6vmin;
+                            margin: 2.5vmin;
+                        }
 
-						a {
-							width: 45vmin;
-							height: 5vmin;
-							font-size: 2.4vmin;
-						}
+                        a {
+                            width: 45vmin;
+                            height: 5vmin;
+                            font-size: 2.4vmin;
+                        }
 
-						.container {
-							width: 45vmin;
-							margin: 2.5vmin;
-							gap: 1.25vmin;
+                        .container {
+                            width: 45vmin;
+                            margin: 2.5vmin;
+                            gap: 1.25vmin;
 
-							div {
-								width: 100%;
-								gap: 1.25vmin;
-							}
-						}
-					}
-				}
+                            div {
+                                width: 100%;
+                                gap: 1.25vmin;
+                            }
+                        }
+                    }
+                }
 
-				h2 {
-					font-size: 4vmin;
-					padding: 4vmin;
-				}
+                h2 {
+                    font-size: 4vmin;
+                    padding: 4vmin;
+                }
 
-				.category-header {
-					font-size: 2.5vmin;
-				}
+                .category-header {
+                    font-size: 2.5vmin;
+                }
 
-				.menu-page-switcher {
-					font-size: 6vmin;
-					padding: 1vmin;
-				}
+                .menu-page-switcher {
+                    font-size: 6vmin;
+                    padding: 1vmin;
+                }
 
-				footer {
-					font-size: 2.2vmin;
-					padding: 1.2vmin;
-				}
-			}
-		}
-	}
+                footer {
+                    font-size: 2.2vmin;
+                    padding: 1.2vmin;
+                }
+            }
+        }
+    }
 
-	@media (orientation: portrait) {
-		body {
-			#menu {
-				#menu-box, #menu-box-2 {
-					flex-direction: column;
+    @media (orientation: portrait) {
+        body {
+            #menu {
+                #menu-box,
+                #menu-box-2 {
+                    flex-direction: column;
 
-					.vertical-line {
-						width: auto;
-						height: 0.2vmin;
-						margin: 0 2vmin;
-					}
-				}
+                    .vertical-line {
+                        width: auto;
+                        height: 0.2vmin;
+                        margin: 0 2vmin;
+                    }
+                }
 
-				footer {
-					font-size: 2.2vmin;
-					display: flex !important;
+                footer {
+                    font-size: 2.2vmin;
+                    display: flex !important;
 
-					span {
-
-						&:nth-child(2) {
-							display: none;
-						}
-					}
-				}
-			}
-		}
-	}
+                    span {
+                        &:nth-child(2) {
+                            display: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

@@ -1,4 +1,4 @@
-window.carsDataAPI = "https://raw.githubusercontent.com/ttsk-ngo/tablice-td2-api/master/carsData.json"
+window.carsDataAPI = 'https://raw.githubusercontent.com/ttsk-ngo/tablice-td2-api/master/carsData.json';
 window.stationAPI = 'https://raw.githubusercontent.com/ttsk-ngo/tablice-td2-api/master/stationsData.json';
 window.operatorsAPI = 'https://raw.githubusercontent.com/ttsk-ngo/tablice-td2-api/master/operatorConvert.json';
 window.namesCorrectionsAPI = 'https://raw.githubusercontent.com/ttsk-ngo/tablice-td2-api/master/namesCorrections.json';
@@ -31,7 +31,7 @@ $(document).ready(() => {
         dataSource = window[`${e.target.id}AsJson`];
 
         if (showPicker) {
-            createJsonTablePicker(dataSource)
+            createJsonTablePicker(dataSource);
         } else {
             $('#table-picker').attr('hidden', '');
             table = ''; // sprawdz czy to jest potrzebne
@@ -47,7 +47,7 @@ $(document).ready(() => {
         tableBody.append(createJsonTable(dataSource[table]));
         searchForDuplicates(dataSource[table], table);
         $('#search').trigger('keyup');
-    })
+    });
 
     $('#search').on('keyup', (e) => {
         let searchedNumber = 0;
@@ -55,20 +55,34 @@ $(document).ready(() => {
             let found = false;
             let selector = '.value';
 
-            $(tr).find('mark').each((index, mark) => {
-                $(mark).replaceWith($(mark).text());
-            });
+            $(tr)
+                .find('mark')
+                .each((index, mark) => {
+                    $(mark).replaceWith($(mark).text());
+                });
 
-            if (['operators', 'symbols'].includes(table)) { selector += ', .key'; }
+            if (['operators', 'symbols'].includes(table)) {
+                selector += ', .key';
+            }
 
-            $(tr).find(selector).each((index, td) => {
-                if (/"(.*?)"/g.exec(e.target.value) && $(td).text() === e.target.value.replace(/"/g, '')
-                || $(td).text().toLowerCase().includes(e.target.value.toLowerCase())) {
-                    found = true;
-                    if (e.target.value !== '') { searchedNumber++; }
-                    $(td).html($(td).text().replace(new RegExp(e.target.value.replace(/"/g, ''), 'gi'), `<mark>$&</mark>`));
-                }
-            });
+            $(tr)
+                .find(selector)
+                .each((index, td) => {
+                    if (
+                        (/"(.*?)"/g.exec(e.target.value) && $(td).text() === e.target.value.replace(/"/g, '')) ||
+                        $(td).text().toLowerCase().includes(e.target.value.toLowerCase())
+                    ) {
+                        found = true;
+                        if (e.target.value !== '') {
+                            searchedNumber++;
+                        }
+                        $(td).html(
+                            $(td)
+                                .text()
+                                .replace(new RegExp(e.target.value.replace(/"/g, ''), 'gi'), `<mark>$&</mark>`)
+                        );
+                    }
+                });
 
             if (found) {
                 $(tr).removeAttr('hidden');
@@ -88,7 +102,9 @@ $(document).ready(() => {
             case 1:
                 searchedNumber = `(${searchedNumber} wynik)`;
                 break;
-            case 2: case 3: case 4:
+            case 2:
+            case 3:
+            case 4:
                 searchedNumber = `(${searchedNumber} wyniki)`;
                 break;
             default:
@@ -103,7 +119,9 @@ function searchForDuplicates(jsonData, table) {
     let trainsNo = {};
     let searchKey = 'trainNo';
 
-    if (table === 'overwrite') { searchKey = 'trainNoStartsWith'; }
+    if (table === 'overwrite') {
+        searchKey = 'trainNoStartsWith';
+    }
     if (['trainNames', 'overwrite'].includes(table)) {
         for (let key in jsonData) {
             for (let trainNo in jsonData[key][searchKey]) {
@@ -126,7 +144,9 @@ function searchForDuplicates(jsonData, table) {
             }
         }
         if (duplicates.length > 0) {
-            duplicates.sort((a, b) => { return a - b });
+            duplicates.sort((a, b) => {
+                return a - b;
+            });
             let duplicate = $('<p>').addClass('red');
             duplicate.html(`<b><i>${key}</i> zawiera duplikaty:</b></br> ${duplicates.join(', ')}`);
             $('#additional-info').append(duplicate);
@@ -147,7 +167,7 @@ function createJsonTablePicker(jsonData) {
 }
 
 function createJsonTable(jsonData) {
-    let table = $('<table>')
+    let table = $('<table>');
 
     if (typeof jsonData === 'string') {
         table = $('<p>').text(jsonData);
@@ -160,9 +180,10 @@ function createJsonTable(jsonData) {
 
             if (typeof jsonData[key] === 'object') {
                 valueName.append(createJsonTable(jsonData[key]));
-            }
-            else {
-                if (jsonData[key] === '') { jsonData[key] = '‎';}
+            } else {
+                if (jsonData[key] === '') {
+                    jsonData[key] = '‎';
+                }
                 if (key === 'trainName' || key === 'remarks') {
                     valueName.addClass('italic');
                 }
@@ -170,7 +191,7 @@ function createJsonTable(jsonData) {
             }
 
             if (isNumber(key)) {
-                keyName.text(parseInt(key)+1);
+                keyName.text(parseInt(key) + 1);
             }
 
             tr.append(keyName).append(valueName);
@@ -202,7 +223,7 @@ function makeAjaxRequest(url, variableName) {
             error: (xhr, status, error) => {
                 console.error(`Error loading ${variableName} from ${url}:`, status, error);
                 reject(new Error(`Failed to load ${variableName}: ${status}`));
-            }
+            },
         });
     });
 }

@@ -1,19 +1,36 @@
 import * as utils from './utils.js';
 
 export function parseTimetable() {
-    let trainSet = [], train = {}, stopList = [], stopListElement = {};
-    if (timetablesAsJson === null) { return; }
-    if (station === '') { return; }
+    let trainSet = [],
+        train = {},
+        stopList = [],
+        stopListElement = {};
+    if (timetablesAsJson === null) {
+        return;
+    }
+    if (station === '') {
+        return;
+    }
     let stationSwitch = !isDeparture;
     timetablesAsJson.forEach((timetable) => {
-        if (timetable.timetable === undefined) { return; }
-        if (timetable.region !== region) { return; }
+        if (timetable.timetable === undefined) {
+            return;
+        }
+        if (timetable.region !== region) {
+            return;
+        }
         timetable['timetable']['stopList'].forEach((stopPoint) => {
-            if (stopPoint['stopTime'] === null) { stopPoint['stopTime'] = 0; }
-            if (stopPoint['stopTime'] > 0 && stopPoint['stopType'] === '') { stopPoint['stopType'] = 'pt'; }
+            if (stopPoint['stopTime'] === null) {
+                stopPoint['stopTime'] = 0;
+            }
+            if (stopPoint['stopTime'] > 0 && stopPoint['stopType'] === '') {
+                stopPoint['stopType'] = 'pt';
+            }
             if (station.toUpperCase() === stopPoint['stopNameRAW'].toUpperCase()) {
                 stationSwitch = !stationSwitch;
-                if (stopPoint['confirmed']) { return; }
+                if (stopPoint['confirmed']) {
+                    return;
+                }
                 if (isStopped && !(stopPoint['beginsHere'] || stopPoint['terminatesHere'])) {
                     if (stopPoint['stopType'] === '') {
                         return;
@@ -21,7 +38,7 @@ export function parseTimetable() {
                 }
                 train = utils.createTrainData(stopPoint, timetable);
             }
-            if (stopTypes.some(stop => stopPoint['stopType'].includes(stop.replace('all', ''))) && stationSwitch) {
+            if (stopTypes.some((stop) => stopPoint['stopType'].includes(stop.replace('all', ''))) && stationSwitch) {
                 if (!stopPoint['stopNameRAW'].toUpperCase().includes('SBL')) {
                     stopListElement.stopPoint = utils.capitalizeFirstLetter(stopPoint['stopNameRAW'].split(',')[0]);
                     stopListElement.arrivalAt = utils.convertTime(stopPoint['arrivalTimestamp']);
@@ -37,8 +54,8 @@ export function parseTimetable() {
             stopListElement = {};
         });
 
-        stopList = stopList.filter(stop => stop.stopPoint !== train.stationFromTo);
-        stopList = stopList.filter(stop => stop.stopPoint !== utils.capitalizeFirstLetter(station).split(',')[0]);
+        stopList = stopList.filter((stop) => stop.stopPoint !== train.stationFromTo);
+        stopList = stopList.filter((stop) => stop.stopPoint !== utils.capitalizeFirstLetter(station).split(',')[0]);
         stopList = stopList.filter((stop, index) => stopList.indexOf(stop) >= index);
         train.timetable = stopList;
 
@@ -73,16 +90,23 @@ export function parseTimetable() {
         }
     }
 
-    window.trainsSetBefore = trainSet.sort((a, b) => { return a.timestamp - b.timestamp });
+    window.trainsSetBefore = trainSet.sort((a, b) => {
+        return a.timestamp - b.timestamp;
+    });
     return trainsSetBefore;
 }
 
 export function parseHistoricalTimetable() {
-    let trainSet = [], train = {}, stopList = [], stopListElement = {};
+    let trainSet = [],
+        train = {},
+        stopList = [],
+        stopListElement = {};
     let stopPoint = {};
     let stationSwitch = !isDeparture;
     oldTimetablesAsJson.forEach((timetable) => {
-        if (region !== 'eu') { return; }
+        if (region !== 'eu') {
+            return;
+        }
         timetable['sceneriesString'].split('%').forEach((scenery, index) => {
             stopPoint.stopName = scenery;
             stopPoint.arrivalDelay = 0;
@@ -93,11 +117,15 @@ export function parseHistoricalTimetable() {
             stopPoint.departureTimestamp = new Date(timetable['checkpointDeparturesScheduled'][index]).getTime();
             stopPoint.beginsHere = timetable['route'].split('|')[0].toUpperCase() === station.toUpperCase();
             stopPoint.terminatesHere = timetable['route'].split('|')[1].toUpperCase() === station.toUpperCase();
-            if (isNaN(stopPoint['stopTime'])) { stopPoint['stopTime'] = 0; }
-            if (stopPoint['stopTime'] > 0 && stopPoint['stopType'] === '') { stopPoint['stopType'] = 'pt'; }
+            if (isNaN(stopPoint['stopTime'])) {
+                stopPoint['stopTime'] = 0;
+            }
+            if (stopPoint['stopTime'] > 0 && stopPoint['stopType'] === '') {
+                stopPoint['stopType'] = 'pt';
+            }
             if (station.toUpperCase() === scenery.toUpperCase()) {
                 stationSwitch = !stationSwitch;
-                if (isStopped && !(timetable['route'].split('|').includes(scenery))) {
+                if (isStopped && !timetable['route'].split('|').includes(scenery)) {
                     if (stopPoint['stopType'] === '') {
                         return;
                     }
@@ -105,23 +133,23 @@ export function parseHistoricalTimetable() {
 
                 train = utils.createTrainData(stopPoint, timetable, true);
             }
-            if (stopTypes.some(stop => stopPoint['stopType'].includes(stop.replace('all', ''))) && stationSwitch) {
-                    stopListElement.stopPoint = utils.capitalizeFirstLetter(stopPoint['stopName'].split(',')[0]);
-                    stopListElement.arrivalAt = utils.convertTime(stopPoint['arrivalTimestamp']);
-                    stopListElement.departureAt = utils.convertTime(stopPoint['departureTimestamp']);
-                    if (stopPoint['stopType'].includes('pm')) {
-                        stopListElement.stopPoint = `${stopListElement.stopPoint}`;
-                        stopListElement.isShunting = true;
-                    }
-                    stopList.push(stopListElement);
+            if (stopTypes.some((stop) => stopPoint['stopType'].includes(stop.replace('all', ''))) && stationSwitch) {
+                stopListElement.stopPoint = utils.capitalizeFirstLetter(stopPoint['stopName'].split(',')[0]);
+                stopListElement.arrivalAt = utils.convertTime(stopPoint['arrivalTimestamp']);
+                stopListElement.departureAt = utils.convertTime(stopPoint['departureTimestamp']);
+                if (stopPoint['stopType'].includes('pm')) {
+                    stopListElement.stopPoint = `${stopListElement.stopPoint}`;
+                    stopListElement.isShunting = true;
+                }
+                stopList.push(stopListElement);
             }
 
             stopPoint = {};
             stopListElement = {};
         });
 
-        stopList = stopList.filter(stop => stop.stopPoint !== train.stationFromTo);
-        stopList = stopList.filter(stop => stop.stopPoint !== utils.capitalizeFirstLetter(station).split(',')[0]);
+        stopList = stopList.filter((stop) => stop.stopPoint !== train.stationFromTo);
+        stopList = stopList.filter((stop) => stop.stopPoint !== utils.capitalizeFirstLetter(station).split(',')[0]);
         stopList = stopList.filter((stop, index) => stopList.indexOf(stop) >= index);
         train.timetable = stopList;
 
@@ -155,7 +183,8 @@ export function parseHistoricalTimetable() {
 }
 
 export function generateStationsList() {
-    let stationsSet = [], station = {};
+    let stationsSet = [],
+        station = {};
     stationDataAsJson.forEach((stationData) => {
         station.name = stationData['sceneryName'];
         station.mainCheckpoint = stationData['mainCheckpoint'];
@@ -167,7 +196,9 @@ export function generateStationsList() {
         station = {};
     });
 
-    window.stationsSet = stationsSet.sort((a, b) => { return a.name.localeCompare(b.name) });
+    window.stationsSet = stationsSet.sort((a, b) => {
+        return a.name.localeCompare(b.name);
+    });
     refreshSceneriesList();
 }
 
@@ -183,23 +214,31 @@ export function refreshSceneriesList() {
         station.isActive = false;
 
         activeStationsAsJson['message'].forEach((activeStation) => {
-            if (activeStation['region'] !== region) { return; }
-            if (!activeStation['isOnline']) { return; }
+            if (activeStation['region'] !== region) {
+                return;
+            }
+            if (!activeStation['isOnline']) {
+                return;
+            }
             if (activeStation['stationName'] === station.name) {
                 station.isActive = true;
             }
         });
 
         if (station.isActive) {
-            activeSceneries.append($('<option>', {
-                text: station.name,
-                value: station.name
-            }));
+            activeSceneries.append(
+                $('<option>', {
+                    text: station.name,
+                    value: station.name,
+                })
+            );
         } else {
-            otherSceneries.append($('<option>', {
-                text: station.name,
-                value: station.name
-            }));
+            otherSceneries.append(
+                $('<option>', {
+                    text: station.name,
+                    value: station.name,
+                })
+            );
         }
     });
 
@@ -215,21 +254,25 @@ export function refreshCheckpointsList() {
             if (!station.mainCheckpointSuffix) {
                 station.mainCheckpointSuffix = '';
             }
-            checkpoints.append($('<option>', {
-                text: utils.capitalizeFirstLetter(station.mainCheckpoint)+station.mainCheckpointSuffix,
-                value: station.mainCheckpoint+station.mainCheckpointSuffix
-            }));
+            checkpoints.append(
+                $('<option>', {
+                    text: utils.capitalizeFirstLetter(station.mainCheckpoint) + station.mainCheckpointSuffix,
+                    value: station.mainCheckpoint + station.mainCheckpointSuffix,
+                })
+            );
             station.points.forEach((checkpoint) => {
                 if (!checkpoint.suffix) {
                     checkpoint.suffix = '';
                 }
-                checkpoints.append($('<option>', {
-                    text: utils.capitalizeFirstLetter(checkpoint.name)+checkpoint.suffix,
-                    value: checkpoint.name+checkpoint.suffix
-                }));
+                checkpoints.append(
+                    $('<option>', {
+                        text: utils.capitalizeFirstLetter(checkpoint.name) + checkpoint.suffix,
+                        value: checkpoint.name + checkpoint.suffix,
+                    })
+                );
             });
         }
-    })
+    });
 }
 
 export function selectCheckpoint() {
@@ -238,7 +281,8 @@ export function selectCheckpoint() {
         refreshCheckpointsList();
         if (urlParams.get('checkpoint') !== null) {
             let checkpoint = urlParams.get('checkpoint').replace('_', ' ');
-            if (checkpoint.includes('MAZ') && !checkpoint.split('MAZ')[1].includes('.')) { //temporary for TOMASZÓW & GRODZISK
+            if (checkpoint.includes('MAZ') && !checkpoint.split('MAZ')[1].includes('.')) {
+                //temporary for TOMASZÓW & GRODZISK
                 checkpoint += '.';
             }
             $('#checkpoints').val(checkpoint);
@@ -259,8 +303,7 @@ export function makeAjaxRequest(url, variableName) {
             error: (xhr, status, error) => {
                 console.error(`Error loading ${variableName} from ${url}:`, status, error);
                 reject(new Error(`Failed to load ${variableName}: ${status}`));
-            }
+            },
         });
     });
 }
-

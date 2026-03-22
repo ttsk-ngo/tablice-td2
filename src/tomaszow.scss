@@ -1,211 +1,210 @@
-$color_1: #FFD200;
-$color_2: #F0F8FF;
+$color_1: #ffd200;
+$color_2: #f0f8ff;
 $color_3: #140075;
-$color_4: #6C6C6C;
-$font-family_1: "Arial", sans-serif;
-$font-family_2: "Segoe UI", sans-serif;
+$color_4: #6c6c6c;
+$font-family_1: 'Arial', sans-serif;
+$font-family_2: 'Segoe UI', sans-serif;
 $background-color_1: #000000;
 $background-color_2: #140075;
-$background-color_3: #F0F8FF;
+$background-color_3: #f0f8ff;
 
 #container {
-	display: flex;
-	flex-flow: column;
-	flex-grow: 1;
-	color: $background-color_1;
-	overflow: hidden;
+    display: flex;
+    flex-flow: column;
+    flex-grow: 1;
+    color: $background-color_1;
+    overflow: hidden;
 
-	&.yellow-text {
-		color: $color_1;
-	}
+    &.yellow-text {
+        color: $color_1;
+    }
 
-	&.white-text {
-		color: $color_2;
-	}
+    &.white-text {
+        color: $color_2;
+    }
 }
 
 #titles {
-	display: flex;
-	align-items: baseline;
-	font-family: $font-family_2;
-	column-gap: 6.5vmin;
-	padding-left: 1.5vmin;
+    display: flex;
+    align-items: baseline;
+    font-family: $font-family_2;
+    column-gap: 6.5vmin;
+    padding-left: 1.5vmin;
 
-	.title-pl {
-		font-size: 10.5vmin;
-		font-weight: bold;
-	}
+    .title-pl {
+        font-size: 10.5vmin;
+        font-weight: bold;
+    }
 
-	.title-en {
-		font-size: 8.5vmin;
-		font-style: italic;
-	}
+    .title-en {
+        font-size: 8.5vmin;
+        font-style: italic;
+    }
 }
 
 #headers {
-	table {
-		font-size: 2vmin;
-		font-weight: bold;
-		border-collapse: separate;
-		width: 100%;
+    table {
+        font-size: 2vmin;
+        font-weight: bold;
+        border-collapse: separate;
+        width: 100%;
 
-		th {
-			line-height: 1em;
-			padding: 2vmin 0 1.5vmin 0;
-			text-align: left;
+        th {
+            line-height: 1em;
+            padding: 2vmin 0 1.5vmin 0;
+            text-align: left;
 
-			&:nth-child(1) {
-				width: 9%;
-				text-align: center;
-			}
+            &:nth-child(1) {
+                width: 9%;
+                text-align: center;
+            }
 
-			&:nth-child(2) {
-				width: 12%;
-				text-align: center;
-			}
+            &:nth-child(2) {
+                width: 12%;
+                text-align: center;
+            }
 
-			&:nth-child(3) {
-				border-left: 1vmin solid black;
-				width: 32%;
-			}
+            &:nth-child(3) {
+                border-left: 1vmin solid black;
+                width: 32%;
+            }
 
-			&:nth-child(5) {
-				vertical-align: bottom;
+            &:nth-child(5) {
+                vertical-align: bottom;
 
-				#inner-description {
-					font-size: 2vmin;
-					font-weight: bold;
-					white-space: nowrap;
-					float: right;
-					text-align: left;
+                #inner-description {
+                    font-size: 2vmin;
+                    font-weight: bold;
+                    white-space: nowrap;
+                    float: right;
+                    text-align: left;
 
-					td {
-						float: right;
+                    td {
+                        float: right;
 
-						&:nth-child(-n+2) {
-							margin-left: 1.5vmin;
-						}
-					}
-				}
-			}
-		}
-	}
+                        &:nth-child(-n + 2) {
+                            margin-left: 1.5vmin;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 #timetables {
-	flex-grow: 1;
-	background-color: $background-color_2;
+    flex-grow: 1;
+    background-color: $background-color_2;
 
-	table {
-		font-weight: bold;
-		table-layout: fixed;
-		width: 100%;
-		border-collapse: separate;
-		background-color: $background-color_2;
+    table {
+        font-weight: bold;
+        table-layout: fixed;
+        width: 100%;
+        border-collapse: separate;
+        background-color: $background-color_2;
 
-		col {
-			&.time {
-				width: 9%;
-			}
+        col {
+            &.time {
+                width: 9%;
+            }
 
-			&.trainNo {
-				width: 12%;
-			}
+            &.trainNo {
+                width: 12%;
+            }
 
-			&.fromTo {
-				width: 32%;
-			}
+            &.fromTo {
+                width: 32%;
+            }
 
-			&.via {
-				width: 29%;
-			}
+            &.via {
+                width: 29%;
+            }
 
-			&.operator {
-				width: 6%;
-			}
+            &.operator {
+                width: 6%;
+            }
 
-			&.platform {
-				width: 4%;
-			}
+            &.platform {
+                width: 4%;
+            }
 
-			&.remarks {
-				width: 8%;
-			}
-		}
+            &.remarks {
+                width: 8%;
+            }
+        }
 
-		.special-row {
-			background-color: $background-color_3;
-			color: $color_3;
-			width: 100%;
+        .special-row {
+            background-color: $background-color_3;
+            color: $color_3;
+            width: 100%;
 
-			span {
-				font-weight: 600;
-				padding-top: 0.2vmin;
-			}
-		}
+            span {
+                font-weight: 600;
+                padding-top: 0.2vmin;
+            }
+        }
 
-		tr {
-			background-color: $background-color_2;
+        tr {
+            background-color: $background-color_2;
 
-			td {
-				color: $color_2;
-				font-size: 4vmin;
-				overflow: hidden;
-				white-space: nowrap;
-				text-align: center;
-				vertical-align: middle;
+            td {
+                color: $color_2;
+                font-size: 4vmin;
+                overflow: hidden;
+                white-space: nowrap;
+                text-align: center;
+                vertical-align: middle;
 
-				span {
-					display: inline-block;
-				}
+                span {
+                    display: inline-block;
+                }
 
-				&:nth-child(2) {
+                &:nth-child(2) {
+                    div {
+                        background-color: $background-color_3;
+                        color: $color_3;
+                    }
+                }
 
-					div {
-						background-color: $background-color_3;
-						color: $color_3;
-					}
-				}
+                &:nth-child(3) {
+                    text-align: left;
+                    border-left: 1vmin solid $color_3;
+                    font-size: 3.6vmin;
+                }
 
-				&:nth-child(3) {
-					text-align: left;
-					border-left: 1vmin solid $color_3;
-					font-size: 3.6vmin;
-				}
+                &:nth-child(4) {
+                    text-align: left;
+                    border-left: 1vmin solid $color_3;
+                    font-style: italic;
+                    font-weight: normal;
+                }
 
-				&:nth-child(4) {
-					text-align: left;
-					border-left: 1vmin solid $color_3;
-					font-style: italic;
-					font-weight: normal;
-				}
+                &:nth-child(7) {
+                    border-left: 1vmin solid $color_3;
+                }
+            }
 
-				&:nth-child(7) {
-					border-left: 1vmin solid $color_3;
-				}
-			}
-
-			&:nth-child(n+14) {
-				display: none;
-			}
-		}
-	}
+            &:nth-child(n + 14) {
+                display: none;
+            }
+        }
+    }
 }
 
 @media only screen and (hover: none) and (orientation: portrait) {
-	#board {
-		transform: rotate(-90deg);
-		transform-origin: left top;
-		width: 100vh;
-		height: 100vw;
-		overflow-x: hidden;
-		position: absolute;
-		top: 100%;
-		left: 0;
-	}
+    #board {
+        transform: rotate(-90deg);
+        transform-origin: left top;
+        width: 100vh;
+        height: 100vw;
+        overflow-x: hidden;
+        position: absolute;
+        top: 100%;
+        left: 0;
+    }
 
-	#button-box {
-		left: 0;
-		align-items: start;
-	}
+    #button-box {
+        left: 0;
+        align-items: start;
+    }
 }
