@@ -71,9 +71,6 @@ window.trainCategory = JSON.parse(localStorage.getItem('trainCategory')) || [
  */
 function applyUrlParameters() {
     window.urlParams = new URLSearchParams(window.location.search);
-    
-    const body = $('body');
-    const overlay = $('#overlay');
 
     // === PARSOWANIE PARAMETRÓW URL ===
     // Wszystkie parametry URL nadpisują localStorage i domyślne wartości
@@ -95,6 +92,7 @@ function applyUrlParameters() {
         };
         window.overlayName = typeMap[urlParams.get('type')] || 'plakat';
         localStorage.overlayName = overlayName;
+        const overlay = $('#overlay');
         if (overlay.length) overlay.val(overlayName);
     }
 
@@ -166,6 +164,7 @@ function applyUrlParameters() {
 
     // Tryb kiosk - ukrywa UI ale NIE nadpisuje innych parametrów
     const hideUI = urlParams.get('hideUI') === 'true' || urlParams.get('mode') === 'kiosk';
+    const body = $('body');
     if (hideUI) {
         $('#button-box').addClass('hidden');
         body.addClass('kiosk');
@@ -318,6 +317,8 @@ $(document).ready(() => {
     let timetablesRequest;
     let operatorsRequest;
     let carsDataRequest;
+    let body = $('body');
+    let overlay = $('#overlay');
 
     // Parsuj parametry URL przy pierwszym załadowaniu
     applyUrlParameters();
