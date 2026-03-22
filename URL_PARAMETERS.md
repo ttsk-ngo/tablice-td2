@@ -2,6 +2,46 @@
 
 Aplikacja tablice-td2 może być w pełni sterowana przez parametry URL, co umożliwia integrację z symulatorami lub używanie jako "headless" display.
 
+## 🔄 Dynamiczna zmiana parametrów (NOWE!)
+
+**Aplikacja automatycznie reaguje na zmiany URL** - nie musisz już przeładowywać całej strony!
+
+### Dla przeglądarki (back/forward buttons)
+```javascript
+// Zmień URL i tablice automatycznie się przeładują
+window.history.pushState(null, '', '?station=Krakow_Glowny&type=krakow');
+```
+
+### Dla symulatorów
+Dedykowana funkcja publiczna:
+```javascript
+// Sposób 1: Obiekt z parametrami
+window.reloadWithNewParams({
+    station: 'Warszawa Wschodnia',
+    checkpoint: 'Wsch',
+    type: 'krakow',
+    timetables: 'departure'
+});
+
+// Sposób 2: Gotowy query string
+window.reloadWithNewParams('?station=Warszawa_Wschodnia&checkpoint=Wsch');
+
+// Sposób 3: Template strings
+const station = 'Krakow Glowny';
+const checkpoint = 'R1';
+window.reloadWithNewParams(`?station=${station.replace(' ', '_')}&checkpoint=${checkpoint}`);
+```
+
+**Co się dzieje po wywołaniu?**
+1. URL w przeglądarce się zmienia
+2. Parametry są ponownie parsowane
+3. Tablice automatycznie się przeładowują z nowymi danymi
+4. Widoczny jest log w konsoli: `"Tablice reloaded with new params: ?station=..."`
+
+**Uwaga:** Pierwsze wywołanie musi poczekać aż aplikacja się załaduje (ok. 1-2 sekundy).
+
+---
+
 ## 🎯 Podstawowe parametry
 
 ### `station` (wymagany)

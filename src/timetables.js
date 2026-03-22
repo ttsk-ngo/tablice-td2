@@ -65,15 +65,15 @@ window.trainCategory = JSON.parse(localStorage.getItem('trainCategory')) || [
     'LS',
 ];
 
-$(document).ready(() => {
+/**
+ * Parsuje parametry URL i aktualizuje globalne zmienne aplikacji
+ * Wywołane przy pierwszym załadowaniu oraz przy dynamicznej zmianie URL
+ */
+function applyUrlParameters() {
     window.urlParams = new URLSearchParams(window.location.search);
-
-    let stationsRequest;
-    let timetablesRequest;
-    let operatorsRequest;
-    let carsDataRequest;
-    let body = $('body');
-    let overlay = $('#overlay');
+    
+    const body = $('body');
+    const overlay = $('#overlay');
 
     // === PARSOWANIE PARAMETRÓW URL ===
     // Wszystkie parametry URL nadpisują localStorage i domyślne wartości
@@ -95,7 +95,7 @@ $(document).ready(() => {
         };
         window.overlayName = typeMap[urlParams.get('type')] || 'plakat';
         localStorage.overlayName = overlayName;
-        overlay.val(overlayName);
+        if (overlay.length) overlay.val(overlayName);
     }
 
     // Rozmiar interfejsu: normal/enlarged (tylko dla krakow)
@@ -165,16 +165,165 @@ $(document).ready(() => {
     }
 
     // Tryb kiosk - ukrywa UI ale NIE nadpisuje innych parametrów
-    if (urlParams.get('hideUI') !== null && urlParams.get('hideUI') === 'true') {
+    const hideUI = urlParams.get('hideUI') === 'true' || urlParams.get('mode') === 'kiosk';
+    if (hideUI) {
         $('#button-box').addClass('hidden');
         body.addClass('kiosk');
+    } else {
+        $('#button-box').removeClass('hidden');
+        body.removeClass('kiosk');
     }
+}
 
-    // Legacy: mode=kiosk (backward compatibility) - teraz tylko ukrywa UI
-    if (urlParams.get('mode') !== null && urlParams.get('mode') === 'kiosk') {
-        $('#button-box').addClass('hidden');
-        body.addClass('kiosk');
+/**
+ * Publiczna funkcja dla symulatora - zmienia URL i przeładowuje tablice
+ * @param {Object|string} params - Obiekt z parametrami lub gotowy query string
+ * @example
+ * window.reloadWithNewParams({station: 'Warszawa', checkpoint: 'Wsch', type: 'krakow'})
+ * window.reloadWithNewParams('?station=Warszawa&checkpoint=Wsch')
+ */
+window.reloadWithNewParams = function(params) {
+    let url = new URL(window.location.href);
+    
+    if (typeof params === 'string') {
+        // Jeśli to string, zastąp query string
+        url.search = params.startsWith('?') ? params : '?' + params;
+    } else {
+        // Jeśli to obiekt, ustaw parametry
+        url = new URL(window.location.origin + window.location.pathname);
+        Object.keys(params).forEach(key => {
+            if (params[key] !== null && params[key] !== undefined) {
+                url.searchParams.set(key, params[key]);
+            }
+        });
     }
+    
+    // Zmień URL bez reloadu strony
+    window.history.pushState(null, '', url.href);
+    
+    // Aplikuj nowe parametry i przeładuj dane
+    handleUrlChange();
+    
+    console.log('Tablice reloaded with new params:', url.search);
+};
+
+/**
+ * Aplikuje parametry station/checkpoint/region z URL do aplikacji
+ * Wywołane po załadowaniu danych stacji oraz przy dynamicznej zmianie URL
+ */
+function applyStationParams() {
+    if (urlParams.get('station') !== null) {
+        window.station = urlParams.get('station').replace(/_/g, ' ');
+        
+        // Obsługa parametru checkpoint
+        if (urlParams.get('checkpoint') !== null) {
+            let checkpointParam = urlParams.get('checkpoint').replace(/_/g, ' ');
+            
+            // Znajdź stację w danych
+            const stationData = stationDataAsJson.find(s => s.sceneryName === station);
+            
+            if (stationData) {
+                let resolvedCheckpoint = null;
+                
+                // Opcja 1: Pełna nazwa checkpointa (z suffixem) - dokładne dopasowanie
+                const mainCheckpointFull = stationData.mainCheckpoint + (stationData.mainCheckpointSuffix || '');
+                if (checkpointParam === mainCheckpointFull || checkpointParam === stationData.mainCheckpoint) {
+                    resolvedCheckpoint = mainCheckpointFull;
+                } else {
+                    // Sprawdź w checkpointach dodatkowych
+                    const foundCheckpoint = stationData.checkpoints.find(cp => {
+                        const fullName = cp.name + (cp.suffix || '');
+                        return checkpointParam === fullName || checkpointParam === cp.name;
+                    });
+                    
+                    if (foundCheckpoint) {
+                        resolvedCheckpoint = foundCheckpoint.name + (foundCheckpoint.suffix || '');
+                    }
+                }
+                
+                // Opcja 2: Jeśli nie znaleziono, użyj dokładnie tego co podano (backward compatibility)
+                if (!resolvedCheckpoint) {
+                    resolvedCheckpoint = checkpointParam;
+                    
+                    // Legacy fixes dla starych URL-i
+                    if (checkpointParam.includes(',') && !checkpointParam.split(',')[1].includes('.')) {
+                        resolvedCheckpoint += '.';
+                    }
+                    if (checkpointParam.includes('MAZ') && !checkpointParam.split('MAZ')[1].includes('.')) {
+                        resolvedCheckpoint += '.';
+                    }
+                }
+                
+                window.station = resolvedCheckpoint;
+                console.log(`Checkpoint resolved: "${checkpointParam}" -> "${resolvedCheckpoint}"`);
+            } else {
+                window.station = checkpointParam;
+            }
+        }
+        
+        // Obsłuż region
+        if (urlParams.get('region') !== null) {
+            switch (urlParams.get('region').toUpperCase()) {
+                case 'PL2':
+                case 'CAE':
+                    window.region = 'cae';
+                    break;
+                case 'DE':
+                case 'USW':
+                    window.region = 'usw';
+                    break;
+                case 'US':
+                case 'CZ':
+                    window.region = 'us';
+                    break;
+                default:
+                    window.region = 'eu';
+                    break;
+            }
+            $('#td2-region').val(region);
+        }
+        
+        // Zaktualizuj dropdowny z nową stacją (jeśli widoczne)
+        const sceneries = $('#sceneries');
+        const checkpoints = $('#checkpoints');
+        if (sceneries.length) sceneries.val(urlParams.get('station').replace(/_/g, ' '));
+        if (checkpoints.length) checkpoints.val(station);
+    }
+}
+
+/**
+ * Obsługuje zmianę URL - przeparsowuje parametry i przeładowuje tablice
+ */
+function handleUrlChange() {
+    console.log('URL changed, reloading timetables...');
+    
+    // Przeparsuj nowe parametry URL
+    applyUrlParameters();
+    
+    // Reinicjalizuj overlay jeśli typ się zmienił
+    initzializeOverlay();
+    
+    // Jeśli aplikacja jest już załadowana (stationsData dostępne)
+    if (window.stationDataAsJson && window.timetablesAsJson) {
+        // Aplikuj parametry station/checkpoint/region
+        applyStationParams();
+        
+        // Przeładuj tablice z nowymi parametrami
+        refreshTimetables();
+    }
+}
+
+$(document).ready(() => {
+    let stationsRequest;
+    let timetablesRequest;
+    let operatorsRequest;
+    let carsDataRequest;
+
+    // Parsuj parametry URL przy pierwszym załadowaniu
+    applyUrlParameters();
+    
+    // Nasłuchuj na zmiany URL (back/forward button, history.pushState)
+    window.addEventListener('popstate', handleUrlChange);
 
     initzializeOverlay();
     initzializeMenu();
@@ -207,79 +356,8 @@ $(document).ready(() => {
     });
 
     $.when(timetablesRequest, stationsRequest, operatorsRequest, carsDataRequest).done(() => {
-        if (urlParams.get('station') !== null) {
-            window.station = urlParams.get('station').replace('_', ' ');
-            
-            // Obsługa parametru checkpoint
-            if (urlParams.get('checkpoint') !== null) {
-                let checkpointParam = urlParams.get('checkpoint').replace('_', ' ');
-                
-                // Znajdź stację w danych
-                const stationData = stationDataAsJson.find(s => s.sceneryName === station);
-                
-                if (stationData) {
-                    let resolvedCheckpoint = null;
-                    
-                    // Opcja 1: Pełna nazwa checkpointa (z suffixem) - dokładne dopasowanie
-                    // np. "Wyraj, po" lub "Krakow Glowny, R1"
-                    const mainCheckpointFull = stationData.mainCheckpoint + (stationData.mainCheckpointSuffix || '');
-                    if (checkpointParam === mainCheckpointFull || checkpointParam === stationData.mainCheckpoint) {
-                        resolvedCheckpoint = mainCheckpointFull;
-                    } else {
-                        // Sprawdź w checkpointach dodatkowych
-                        const foundCheckpoint = stationData.checkpoints.find(cp => {
-                            const fullName = cp.name + (cp.suffix || '');
-                            return checkpointParam === fullName || checkpointParam === cp.name;
-                        });
-                        
-                        if (foundCheckpoint) {
-                            resolvedCheckpoint = foundCheckpoint.name + (foundCheckpoint.suffix || '');
-                        }
-                    }
-                    
-                    // Opcja 2: Jeśli nie znaleziono, użyj dokładnie tego co podano (backward compatibility)
-                    // Obsługuje legacy formaty z kropkami itp.
-                    if (!resolvedCheckpoint) {
-                        resolvedCheckpoint = checkpointParam;
-                        
-                        // Legacy fixes dla starych URL-i
-                        if (checkpointParam.includes(',') && !checkpointParam.split(',')[1].includes('.')) {
-                            resolvedCheckpoint += '.';
-                        }
-                        if (checkpointParam.includes('MAZ') && !checkpointParam.split('MAZ')[1].includes('.')) {
-                            resolvedCheckpoint += '.';
-                        }
-                    }
-                    
-                    window.station = resolvedCheckpoint;
-                    console.log(`Checkpoint resolved: "${checkpointParam}" -> "${resolvedCheckpoint}"`);
-                } else {
-                    // Stacja nie znaleziona w danych - użyj parametru jak jest (fallback)
-                    window.station = checkpointParam;
-                }
-            }
-            
-            if (urlParams.get('region') !== null) {
-                switch (urlParams.get('region').toUpperCase()) {
-                    case 'PL2':
-                    case 'CAE':
-                        window.region = 'cae';
-                        break;
-                    case 'DE':
-                    case 'USW':
-                        window.region = 'usw';
-                        break;
-                    case 'US':
-                    case 'CZ':
-                        window.region = 'us';
-                        break;
-                    default:
-                        window.region = 'eu';
-                        break;
-                }
-                $('#td2-region').val(region);
-            }
-        }
+        // Aplikuj parametry station/checkpoint/region z URL (pierwsze załadowanie)
+        applyStationParams();
     });
 
     let timetableDate = $('#timetable-date');
