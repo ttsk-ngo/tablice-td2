@@ -75,41 +75,104 @@ $(document).ready(() => {
     let body = $('body');
     let overlay = $('#overlay');
 
+    // === PARSOWANIE PARAMETRÓW URL ===
+    // Wszystkie parametry URL nadpisują localStorage i domyślne wartości
+    
+    // Typ tablicy: departure/arrival
     if (urlParams.get('timetables') !== null) {
-        if (urlParams.get('timetables') === 'departure') {
-            window.isDeparture = true;
-        } else {
-            window.isDeparture = urlParams.get('timetables') !== 'arrival';
-        }
+        window.isDeparture = urlParams.get('timetables') === 'departure';
+        localStorage.isDeparture = isDeparture;
     }
 
+    // Wygląd tablicy: tomaszow/krakow/starysacz/plakat/wyciag
     if (urlParams.get('type') !== null) {
-        switch (urlParams.get('type')) {
-            case 'tomaszow':
-                window.overlayName = 'tomaszow';
-                break;
-            case 'krakow':
-                window.overlayName = 'krakow';
-                break;
-            case 'starysacz':
-                window.overlayName = 'starysacz';
-                break;
-            case 'wyciag':
-                window.overlayName = 'wyciag';
-                break;
-            default:
-                window.overlayName = 'plakat';
-                break;
-        }
+        const typeMap = {
+            'tomaszow': 'tomaszow',
+            'krakow': 'krakow',
+            'starysacz': 'starysacz',
+            'wyciag': 'wyciag',
+            'plakat': 'plakat'
+        };
+        window.overlayName = typeMap[urlParams.get('type')] || 'plakat';
+        localStorage.overlayName = overlayName;
         overlay.val(overlayName);
     }
 
+    // Rozmiar interfejsu: normal/enlarged (tylko dla krakow)
+    if (urlParams.get('size') !== null) {
+        window.timetableSize = urlParams.get('size') === 'enlarged' ? 'enlarged' : 'normal';
+        localStorage.timetableSize = timetableSize;
+    }
+
+    // Typy postoju: ph,pt,pm lub all
+    if (urlParams.get('stopTypes') !== null) {
+        const types = urlParams.get('stopTypes').split(',');
+        window.stopTypes = types.includes('all') ? ['all'] : types.filter(t => ['ph', 'pt', 'pm'].includes(t));
+        if (stopTypes.length === 0) stopTypes = ['ph']; // fallback
+        localStorage.setItem('stopTypes', JSON.stringify(stopTypes));
+    }
+
+    // Typy pociągów: EMRP,T,L,Z (maska kategorii)
+    if (urlParams.get('trainTypes') !== null) {
+        const types = urlParams.get('trainTypes').split(',');
+        window.trainTypes = types.filter(t => ['E', 'M', 'R', 'P', 'T', 'L', 'Z'].includes(t));
+        if (trainTypes.length === 0) trainTypes = ['EMRP']; // fallback
+        localStorage.setItem('trainTypes', JSON.stringify(trainTypes));
+    }
+
+    // Kategorie pociągów: EI,EC,EN,MP,... (lista kategorii do wyświetlenia)
+    if (urlParams.get('trainCategory') !== null) {
+        const categories = urlParams.get('trainCategory').split(',');
+        window.trainCategory = categories;
+        localStorage.setItem('trainCategory', JSON.stringify(trainCategory));
+    }
+
+    // Tylko rozkłady z postojem (true/false)
+    if (urlParams.get('isStopped') !== null) {
+        window.isStopped = urlParams.get('isStopped') === 'true';
+        localStorage.isStopped = isStopped;
+    }
+
+    // Pokazuj przewoźników (true/false)
+    if (urlParams.get('showOperators') !== null) {
+        window.showOperators = urlParams.get('showOperators') === 'true';
+        localStorage.showOperators = showOperators;
+    }
+
+    // Pokazuj rozkłady historyczne (true/false)
+    if (urlParams.get('showHistory') !== null) {
+        window.showHistory = urlParams.get('showHistory') === 'true';
+        localStorage.showHistory = showHistory;
+    }
+
+    // Pokazuj rozkłady zrealizowane (true/false)
+    if (urlParams.get('isFulfilled') !== null) {
+        window.isFulfilled = urlParams.get('isFulfilled') === 'true';
+    }
+
+    // Pokazuj rozkłady zakończone (true/false)
+    if (urlParams.get('isTerminated') !== null) {
+        window.isTerminated = urlParams.get('isTerminated') === 'true';
+    }
+
+    // Czas odświeżania w sekundach
+    if (urlParams.get('refreshTime') !== null) {
+        const time = parseInt(urlParams.get('refreshTime'));
+        if (!isNaN(time) && time > 0) {
+            window.refreshTime = time;
+            localStorage.refreshTime = refreshTime;
+        }
+    }
+
+    // Tryb kiosk - ukrywa UI ale NIE nadpisuje innych parametrów
+    if (urlParams.get('hideUI') !== null && urlParams.get('hideUI') === 'true') {
+        $('#button-box').addClass('hidden');
+        body.addClass('kiosk');
+    }
+
+    // Legacy: mode=kiosk (backward compatibility) - teraz tylko ukrywa UI
     if (urlParams.get('mode') !== null && urlParams.get('mode') === 'kiosk') {
-        $('#button-box').toggleClass('hidden');
-        window.isDeparture = true;
-        //window.isStopped = true;
-        window.showHistory = true;
-        window.showOperators = true;
+        $('#button-box').addClass('hidden');
         body.addClass('kiosk');
     }
 
