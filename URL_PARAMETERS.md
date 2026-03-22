@@ -13,9 +13,35 @@ Nazwa scenerii do wyświetlenia
 **Uwaga:** Spacje w nazwach zastąp przez `_` (underscore)
 
 ### `checkpoint` (opcjonalny)
-Konkretny punkt posterunkowy na scenerii
+Konkretny punkt posterunkowy na scenerii. Można podać na dwa sposoby:
+
+**Sposób 1: Sama nazwa punktu (rekomendowane)**
+Aplikacja automatycznie doda suffix (np. ", po", ", R1") na podstawie danych ze stationsData.json
 ```
-?station=Krakow_Glowny&checkpoint=Krakow_Glowny,R1
+?station=Arkadia_Zdroj_2022&checkpoint=Wyraj
+?station=Krakow_Glowny&checkpoint=Krakow_Glowny
+```
+
+**Sposób 2: Pełna nazwa z suffixem**
+Jeśli znasz dokładną nazwę punktu z suffixem:
+```
+?station=Arkadia_Zdroj_2022&checkpoint=Wyraj,_po
+?station=Krakow_Glowny&checkpoint=Krakow_Glowny,_R1
+```
+
+**Jak znaleźć dostępne checkpointy?**
+Sprawdź w pliku `stationsData.json`:
+- `mainCheckpoint` - główny punkt scenerii
+- `checkpoints[].name` - dodatkowe punkty
+
+**Przykłady:**
+```json
+"sceneryName": "Arkadia Zdrój 2022",
+"mainCheckpoint": "Arkadia Zdrój",      ← użyj: ?checkpoint=Arkadia_Zdroj
+"checkpoints": [
+    { "name": "Wyraj", "suffix": ", po" }  ← użyj: ?checkpoint=Wyraj
+    { "name": "Nawia", "suffix": ", podg" } ← użyj: ?checkpoint=Nawia
+]
 ```
 
 ### `region` (opcjonalny, domyślnie: `eu`)

@@ -29,8 +29,13 @@ class TabliceUrlBuilder {
 
     /**
      * Ustaw punkt posterunkowy
-     * @param {string} checkpointName - Nazwa punktu
+     * Można podać samą nazwę punktu (np. "Wyraj"), aplikacja automatycznie doda suffix.
+     * Lub pełną nazwę z suffixem (np. "Wyraj, po")
+     * @param {string} checkpointName - Nazwa punktu (opcjonalnie z suffixem)
      * @returns {TabliceUrlBuilder}
+     * @example
+     * .checkpoint('Wyraj')              // Automatycznie doda suffix ze stationsData.json
+     * .checkpoint('Krakow Glowny, R1')  // Pełna nazwa z suffixem
      */
     checkpoint(checkpointName) {
         this.params.set('checkpoint', checkpointName.replace(/ /g, '_'));

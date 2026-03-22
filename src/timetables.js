@@ -209,17 +209,56 @@ $(document).ready(() => {
     $.when(timetablesRequest, stationsRequest, operatorsRequest, carsDataRequest).done(() => {
         if (urlParams.get('station') !== null) {
             window.station = urlParams.get('station').replace('_', ' ');
+            
+            // Obsługa parametru checkpoint
             if (urlParams.get('checkpoint') !== null) {
-                let checkpoint = urlParams.get('checkpoint').replace('_', ' ');
-                if (checkpoint.includes(',') && !checkpoint.split(',')[1].includes('.')) {
-                    checkpoint += '.';
+                let checkpointParam = urlParams.get('checkpoint').replace('_', ' ');
+                
+                // Znajdź stację w danych
+                const stationData = stationDataAsJson.find(s => s.sceneryName === station);
+                
+                if (stationData) {
+                    let resolvedCheckpoint = null;
+                    
+                    // Opcja 1: Pełna nazwa checkpointa (z suffixem) - dokładne dopasowanie
+                    // np. "Wyraj, po" lub "Krakow Glowny, R1"
+                    const mainCheckpointFull = stationData.mainCheckpoint + (stationData.mainCheckpointSuffix || '');
+                    if (checkpointParam === mainCheckpointFull || checkpointParam === stationData.mainCheckpoint) {
+                        resolvedCheckpoint = mainCheckpointFull;
+                    } else {
+                        // Sprawdź w checkpointach dodatkowych
+                        const foundCheckpoint = stationData.checkpoints.find(cp => {
+                            const fullName = cp.name + (cp.suffix || '');
+                            return checkpointParam === fullName || checkpointParam === cp.name;
+                        });
+                        
+                        if (foundCheckpoint) {
+                            resolvedCheckpoint = foundCheckpoint.name + (foundCheckpoint.suffix || '');
+                        }
+                    }
+                    
+                    // Opcja 2: Jeśli nie znaleziono, użyj dokładnie tego co podano (backward compatibility)
+                    // Obsługuje legacy formaty z kropkami itp.
+                    if (!resolvedCheckpoint) {
+                        resolvedCheckpoint = checkpointParam;
+                        
+                        // Legacy fixes dla starych URL-i
+                        if (checkpointParam.includes(',') && !checkpointParam.split(',')[1].includes('.')) {
+                            resolvedCheckpoint += '.';
+                        }
+                        if (checkpointParam.includes('MAZ') && !checkpointParam.split('MAZ')[1].includes('.')) {
+                            resolvedCheckpoint += '.';
+                        }
+                    }
+                    
+                    window.station = resolvedCheckpoint;
+                    console.log(`Checkpoint resolved: "${checkpointParam}" -> "${resolvedCheckpoint}"`);
+                } else {
+                    // Stacja nie znaleziona w danych - użyj parametru jak jest (fallback)
+                    window.station = checkpointParam;
                 }
-                if (checkpoint.includes('MAZ') && !checkpoint.split('MAZ')[1].includes('.')) {
-                    //temporary for TOMASZÓW & GRODZISK
-                    checkpoint += '.';
-                }
-                window.station = checkpoint;
             }
+            
             if (urlParams.get('region') !== null) {
                 switch (urlParams.get('region').toUpperCase()) {
                     case 'PL2':

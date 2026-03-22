@@ -7,7 +7,6 @@ Aplikacja może być w pełni sterowana przez parametry URL - **idealne do integ
 ### 📚 Dokumentacja
 - **[URL_PARAMETERS.md](URL_PARAMETERS.md)** - Kompletna dokumentacja wszystkich parametrów URL
 - **[TabliceUrlBuilder.js](TabliceUrlBuilder.js)** - Helper do programowego budowania URL-i
-- **[url-test.html](url-test.html)** - Strona testowa z przykładami URL
 
 ### ⚡ Szybki start
 
