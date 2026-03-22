@@ -65,7 +65,7 @@ $(document).ready(() => {
                 if (/"(.*?)"/g.exec(e.target.value) && $(td).text() === e.target.value.replace(/"/g, '')
                 || $(td).text().toLowerCase().includes(e.target.value.toLowerCase())) {
                     found = true;
-                    if (e.target.value !== '') { searchedNumber++;  console.log(e.target.value);}
+                    if (e.target.value !== '') { searchedNumber++; }
                     $(td).html($(td).text().replace(new RegExp(e.target.value.replace(/"/g, ''), 'gi'), `<mark>$&</mark>`));
                 }
             });
@@ -190,13 +190,18 @@ function isNumber(n) {
 }
 
 function makeAjaxRequest(url, variableName) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         $.ajax({
             url: url,
             dataType: 'json',
+            timeout: 30000,
             success: (response) => {
                 window[variableName] = response;
-                resolve();
+                resolve(response);
+            },
+            error: (xhr, status, error) => {
+                console.error(`Error loading ${variableName} from ${url}:`, status, error);
+                reject(new Error(`Failed to load ${variableName}: ${status}`));
             }
         });
     });

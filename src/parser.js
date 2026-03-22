@@ -247,13 +247,18 @@ export function selectCheckpoint() {
 }
 
 export function makeAjaxRequest(url, variableName) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         $.ajax({
             url: url,
             dataType: 'json',
+            timeout: 30000,
             success: (response) => {
                 window[variableName] = response;
-                resolve();
+                resolve(response);
+            },
+            error: (xhr, status, error) => {
+                console.error(`Error loading ${variableName} from ${url}:`, status, error);
+                reject(new Error(`Failed to load ${variableName}: ${status}`));
             }
         });
     });
