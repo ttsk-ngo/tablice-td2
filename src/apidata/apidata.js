@@ -1,7 +1,7 @@
-window.carsDataAPI = "https://raw.githubusercontent.com/Thundo54/tablice-td2-api/master/carsData.json"
-window.stationAPI = 'https://raw.githubusercontent.com/Thundo54/tablice-td2-api/master/stationsData.json';
-window.operatorsAPI = 'https://raw.githubusercontent.com/Thundo54/tablice-td2-api/master/operatorConvert.json';
-window.namesCorrectionsAPI = 'https://raw.githubusercontent.com/Thundo54/tablice-td2-api/master/namesCorrections.json';
+window.carsDataAPI = "https://raw.githubusercontent.com/ttsk-ngo/tablice-td2-api/master/carsData.json"
+window.stationAPI = 'https://raw.githubusercontent.com/ttsk-ngo/tablice-td2-api/master/stationsData.json';
+window.operatorsAPI = 'https://raw.githubusercontent.com/ttsk-ngo/tablice-td2-api/master/operatorConvert.json';
+window.namesCorrectionsAPI = 'https://raw.githubusercontent.com/ttsk-ngo/tablice-td2-api/master/namesCorrections.json';
 window.carsDataAsJson = null;
 window.stationDataAsJson = null;
 window.operatorsAsJson = null;
