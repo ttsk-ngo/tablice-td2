@@ -52,6 +52,7 @@ const url = new TabliceUrlBuilder('https://tablice.example.com')
 | `showOperators` | true\|false | Pokazuj przewoźników |
 | `showHistory` | true\|false | Pokazuj rozkłady historyczne |
 | `hideUI` | true\|false | Ukryj interfejs (tryb kiosk) |
+| `animations` | false\|true\|auto | Animacje tekstów (auto) |
 | `refreshTime` | liczba | Odświeżanie w sekundach |
 
 Zobacz [URL_PARAMETERS.md](URL_PARAMETERS.md) dla pełnej listy parametrów.

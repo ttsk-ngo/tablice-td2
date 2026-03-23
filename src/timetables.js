@@ -14,6 +14,7 @@ window.overlayName = localStorage.getItem('overlayName') || 'krakow';
 window.showOperators = localStorage.getItem('showOperators') === 'true';
 window.showHistory = localStorage.getItem('showHistory') === 'true';
 window.refreshTime = localStorage.getItem('refreshTime') || 60;
+window.enableAnimations = localStorage.getItem('enableAnimations') || 'auto';
 window.timetablesAsJson = null;
 window.oldTimetablesAsJson = null;
 window.stationDataAsJson = null;
@@ -159,6 +160,15 @@ function applyUrlParameters() {
         if (!isNaN(time) && time > 0) {
             window.refreshTime = time;
             localStorage.refreshTime = refreshTime;
+        }
+    }
+
+    // Animacje tekstów: false, true, auto (domyślnie auto)
+    if (urlParams.get('animations') !== null) {
+        const animValue = urlParams.get('animations');
+        if (['false', 'true', 'auto'].includes(animValue)) {
+            window.enableAnimations = animValue;
+            localStorage.enableAnimations = enableAnimations;
         }
     }
 
@@ -1029,7 +1039,21 @@ export function refreshTimetablesAnim() {
                 animDuration = (($(span[k]).width() + fieldWidth) * 10) / 400;
 
                 if ($(span[k]).css('animation-duration') !== animDuration) {
-                    if ($(span[k]).width() > fieldWidth * widthRatio) {
+                    // Sprawdź tryb animacji
+                    let shouldAnimate = false;
+                    
+                    if (enableAnimations === 'true') {
+                        // Zawsze animuj
+                        shouldAnimate = true;
+                    } else if (enableAnimations === 'false') {
+                        // Nigdy nie animuj
+                        shouldAnimate = false;
+                    } else {
+                        // Auto - sprawdź czy tekst się mieści (domyślne)
+                        shouldAnimate = $(span[k]).width() > fieldWidth * widthRatio;
+                    }
+                    
+                    if (shouldAnimate) {
                         $(span[k]).css('animation', `ticker linear ${animDuration}s infinite`);
                         $(span[k]).css('--elementWidth', fieldWidth + 'px');
                     } else {

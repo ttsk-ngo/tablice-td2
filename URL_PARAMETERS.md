@@ -242,6 +242,23 @@ Aktywuje tryb kiosk (ukrywa UI). **Uwaga:** w poprzedniej wersji nadpisywał inn
 ```
 **Zalecane:** Użyj `hideUI=true` zamiast `mode=kiosk`
 
+### `animations` (opcjonalny, domyślnie: `auto`)
+Kontroluje animacje scrollujących tekstów (dla typów: krakow, tomaszow, starysacz)
+- `false` - wyłącz wszystkie animacje tekstów
+- `true` - włącz animacje dla wszystkich tekstów
+- `auto` - animuj tylko gdy tekst nie mieści się w kontenerze (domyślne, responsywne)
+
+```
+?animations=false        # Brak animacji (lepsza wydajność)
+?animations=true         # Wszystkie teksty animowane
+?animations=auto         # Inteligentne (domyślne)
+```
+
+**Zastosowanie:**
+- `false` - dla lepszej wydajności, zrzutów ekranu, nagrań wideo
+- `true` - pełny efekt wizualny niezależnie od rozmiaru okna
+- `auto` - automatyczne dopasowanie do rozdzielczości przeglądarki
+
 ---
 
 ## 📋 Przykłady użycia
